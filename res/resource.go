@@ -1,10 +1,15 @@
 package res
 
+/*
+#include <stdlib.h> // use malloc, free
+*/
+import "C"
 import (
 	"math/rand"
 	"runtime"
 	"sync"
 	"time"
+	"unsafe"
 
 	"github.com/jiangklijna/res-maker/def"
 )
@@ -123,7 +128,11 @@ func memEat(num uint, stopCh chan uint) {
 	// Convert GB to bytes
 	requestedSizeInBytes := uint64(num) * (1024 * 1024 * 1024)
 	// Allocate memory using make([]byte, sizeInBytes) instead of unsafe package
-	memoryBlock := make([]byte, requestedSizeInBytes)
+	ptr := C.malloc(C.size_t(requestedSizeInBytes))
+	if ptr == nil {
+		panic("Failed to allocate memory.")
+	}
+	memoryBlock := unsafe.Slice((*byte)(ptr), int(requestedSizeInBytes))
 	for i := range memoryBlock {
 		memoryBlock[i] = byte(i)
 	}
@@ -131,8 +140,7 @@ func memEat(num uint, stopCh chan uint) {
 	for {
 		select {
 		case <-stopCh:
-			memoryBlock = nil
-			runtime.GC()
+			C.free(ptr)
 			return
 		default:
 			i := rand.Intn(int(requestedSizeInBytes))

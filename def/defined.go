@@ -1,7 +1,10 @@
 package def
 
+// Name of this program
+const Name = "res-marker"
+
 // Version of this program
-const Version = "0.2"
+const Version = "0.3"
 
 // ResType Resource type
 type ResType uint

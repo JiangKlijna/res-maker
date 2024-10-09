@@ -1,10 +1,28 @@
 package cmd
 
+/*
+#include <stdio.h>
+
+// print c compiler version
+void print_c_compiler_version() {
+    #ifdef __GNUC__
+        printf("c compiler: GCC %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+    #elif defined(__clang__)
+        printf("c compiler: Clang %s\n", __clang_version__);
+    #elif defined(_MSC_VER)
+        printf("c compiler: MSVC %d\n", _MSC_VER);
+    #else
+        printf("c compiler: Unknown\n");
+    #endif
+}
+*/
+import "C"
 import (
 	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -48,7 +66,9 @@ func GetParameter() Parameter {
 	if *help {
 		flag.Usage()
 	} else if *version {
-		println("version", def.Version)
+		fmt.Println(def.Name, "version:", def.Version)
+		fmt.Println("golang", "version:", runtime.Version())
+		C.print_c_compiler_version()
 	} else {
 		p.init()
 		return p
