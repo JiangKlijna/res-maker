@@ -2,23 +2,29 @@
 *.exe
 *.exe~
 *.dll
+*.a
 *.so
 *.dylib
 *.lib
+*.out
 
 # Test binary, built with `go test -c`
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+# Dependency directories
+vendor/
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
+# IDEs
 .idea/
 .vscode/
 
+# Build
 build/
 tmp/
+temp/
+dist/
+out/
 
+# Other files
+*.syso
 *.json

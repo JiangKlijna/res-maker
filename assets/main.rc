@@ -1,0 +1,34 @@
+// resource.rc
+
+// icon
+IDI_ICON1 ICON "main.ico"
+
+// version info
+1 VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS 0x40004L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "jiangklijna\0"
+            VALUE "FileDescription", "res maker\0"
+            VALUE "FileVersion", "0.3.0.0\0"
+            VALUE "InternalName", "res-maker\0"
+            VALUE "LegalCopyright", "Copyright @ 2015 jiangklijna\0"
+            VALUE "OriginalFilename", "res-maker\0"
+            VALUE "ProductName", "res-maker\0"
+            VALUE "ProductVersion", "0.3.0.0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

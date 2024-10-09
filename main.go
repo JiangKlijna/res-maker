@@ -1,3 +1,4 @@
+//go:generate windres assets/main.rc -o main.syso
 package main
 
 import (
