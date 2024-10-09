@@ -28,3 +28,9 @@ out/
 # Other files
 *.syso
 *.json
+*.zip
+*.rar
+*.7z
+*.tar*
+
+res-maker*
