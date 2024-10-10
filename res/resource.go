@@ -5,7 +5,6 @@ package res
 */
 import "C"
 import (
-	"math/rand"
 	"runtime"
 	"sync"
 	"time"
@@ -130,21 +129,33 @@ func memEat(num uint, stopCh chan uint) {
 	// Allocate memory using make([]byte, sizeInBytes) instead of unsafe package
 	ptr := C.malloc(C.size_t(requestedSizeInBytes))
 	if ptr == nil {
-		panic("Failed to allocate memory.")
+		def.LogWarning("Warning: Failed to allocate", num, "G memory.")
+		nilEat(stopCh)
+		return
 	}
 	memoryBlock := unsafe.Slice((*byte)(ptr), int(requestedSizeInBytes))
 	for i := range memoryBlock {
 		memoryBlock[i] = byte(i)
 	}
+
+	// Suspend access every 600 times to prevent being compressed into virtual memory by OS
+	count := requestedSizeInBytes / 600
+	cursor := uint64(0)
 	// Simulate using the memory block
 	for {
 		select {
 		case <-stopCh:
 			C.free(ptr)
+			ptr = nil
 			return
 		default:
-			i := rand.Intn(int(requestedSizeInBytes))
-			memoryBlock[i] = byte(i)
+			for j := uint64(0); j < count; j++ {
+				cursor++
+				if cursor >= requestedSizeInBytes {
+					cursor = 0
+				}
+				memoryBlock[cursor] = byte(j)
+			}
 			time.Sleep(1 * time.Second)
 		}
 	}

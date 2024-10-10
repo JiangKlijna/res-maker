@@ -69,6 +69,7 @@ func GetParameter() Parameter {
 		fmt.Println(def.Name, "version:", def.Version)
 		fmt.Println("golang", "version:", runtime.Version())
 		C.print_c_compiler_version()
+		fmt.Println("os:", runtime.GOOS, "arch:", runtime.GOARCH)
 	} else {
 		p.init()
 		return p
@@ -81,12 +82,14 @@ func (p *parameter) init() {
 	if len(p.configFile) > 0 {
 		content, err := os.ReadFile(p.configFile)
 		if err != nil {
-			panic(err)
+			def.LogError("Read file failed.", err.Error())
+			os.Exit(1)
 		}
-		config := make(map[string]map[string]*uint)
+		config := make(map[string]map[string]uint)
 		err = json.Unmarshal(content, &config)
 		if err != nil {
-			panic(err)
+			def.LogError("config[", p.configFile, "], JSON parsing failed.", err.Error())
+			os.Exit(1)
 		}
 		if m, isOk := config[def.Cpu.Name()]; isOk {
 			p.cpuNs = convert(m)
@@ -95,28 +98,28 @@ func (p *parameter) init() {
 			p.memNs = convert(m)
 		}
 		if p.cpuNs == nil && p.memNs == nil {
-			fmt.Println(time.Now().Format(time.DateTime), "Error: config[", p.configFile, "], cpu or mem is not null")
+			def.LogError("config[", p.configFile, "], cpu or mem is not null")
 			os.Exit(1)
 		}
 	} else {
 		if p.nCores < 0 {
-			fmt.Println(time.Now().Format(time.DateTime), "Warning: cpu should be >= 0")
+			def.LogWarning("-c should be >= 0")
 			p.nCores = 0
 		}
 		if p.nMemGs < 0 {
-			fmt.Println(time.Now().Format(time.DateTime), "Warning: mem should be >= 0")
+			def.LogWarning("-m should be >= 0")
 			p.nMemGs = 0
 		}
 		if p.nCores == 0 && p.nMemGs == 0 {
-			fmt.Println(time.Now().Format(time.DateTime), "Error: cpu or mem must be >= 0")
+			def.LogError("-c or -m must be > 0")
 			os.Exit(1)
 		}
 	}
 	if len(p.duration) > 0 {
 		d, err := parseDuration(p.duration)
 		if err != nil {
-			fmt.Println(time.Now().Format(time.DateTime), "Error:")
-			panic(err)
+			def.LogError(err)
+			os.Exit(1)
 		}
 		p.timeDuration = d
 	}
@@ -158,23 +161,21 @@ func (p *parameter) GetDuration() time.Duration {
 	return p.timeDuration
 }
 
-func convert(m map[string]*uint) *[24]uint {
+func convert(m map[string]uint) *[24]uint {
 	var arr [24]uint
 	if len(m) == 0 {
 		return &arr
 	}
 	var pre uint
 	for i := 23; i >= 0; i-- {
-		u := m[formatIndex(i)]
-		if u != nil {
-			pre = *u
+		if u, exist := m[formatIndex(i)]; exist {
+			pre = u
 			break
 		}
 	}
 	for i := 0; i < 24; i++ {
-		u := m[formatIndex(i)]
-		if u != nil {
-			pre = *u
+		if u, exist := m[formatIndex(i)]; exist {
+			pre = u
 		}
 		arr[i] = pre
 	}

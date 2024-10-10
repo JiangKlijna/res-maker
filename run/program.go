@@ -1,7 +1,6 @@
 package run
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -55,6 +54,7 @@ func runConfigFile(m map[def.ResType][24]uint) {
 			hour = now.Hour()
 			for resType, r := range resMap {
 				ns := m[resType]
+				def.LogInfo(resType.Name(), "Usage:", ns[hour], resType.Unit())
 				if r.Num() != ns[hour] {
 					r.Free()
 					time.Sleep(time.Second)
@@ -62,7 +62,6 @@ func runConfigFile(m map[def.ResType][24]uint) {
 					go r.Eat()
 					resMap[resType] = r
 				}
-				fmt.Println(now.Format(time.DateTime), resType.Name(), "Usage:", ns[hour], resType.Unit())
 			}
 		}()
 		// sleep to next hour
@@ -77,7 +76,7 @@ func runParameter(m map[def.ResType]uint) map[def.ResType]res.Res {
 		newRes := res.NewRes(num, resType)
 		go newRes.Eat()
 		arr[resType] = newRes
-		fmt.Println(time.Now().Format(time.DateTime), resType.Name(), "Usage:", num, resType.Unit())
+		def.LogInfo(resType.Name(), "Usage:", num, resType.Unit())
 	}
 	return arr
 }

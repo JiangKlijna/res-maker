@@ -1,5 +1,10 @@
 package def
 
+import (
+	"fmt"
+	"time"
+)
+
 // Name of this program
 const Name = "res-marker"
 
@@ -36,4 +41,22 @@ func (rt ResType) Unit() string {
 	default:
 		panic("unreachable code")
 	}
+}
+
+// LogInfo log info
+func LogInfo(a ...any) {
+	fmt.Print(time.Now().Format(time.DateTime), " [Info] ")
+	fmt.Println(a...)
+}
+
+// LogWarning log warning
+func LogWarning(a ...any) {
+	fmt.Print(time.Now().Format(time.DateTime), " [Warning] ")
+	fmt.Println(a...)
+}
+
+// LogError log error
+func LogError(a ...any) {
+	fmt.Print(time.Now().Format(time.DateTime), " [Error] ")
+	fmt.Println(a...)
 }
